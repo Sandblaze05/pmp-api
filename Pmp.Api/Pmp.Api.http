@@ -1,6 +1,63 @@
 @Pmp.Api_HostAddress = http://localhost:5218
 
-GET {{Pmp.Api_HostAddress}}/weatherforecast/
+### Get all projects
+GET {{Pmp.Api_HostAddress}}/api/projects
 Accept: application/json
 
 ###
+
+### Get a project by ID
+GET {{Pmp.Api_HostAddress}}/api/projects/{projectId}
+Accept: application/json
+
+###
+
+### Create a project
+POST {{Pmp.Api_HostAddress}}/api/projects
+Content-Type: application/json
+
+{
+  "customerName": "Example Customer",
+  "projectName": "Example Project",
+  "projectStartDate": "2026-01-01T00:00:00Z",
+  "projectEndDate": "2026-06-30T00:00:00Z",
+  "revisedEndDate": null,
+  "renewalDate": null,
+  "projectIssueDate": "2025-12-15T00:00:00Z",
+  "estimatedHours": 1200,
+  "actualHours": null,
+  "onshoreManagerName": "Onshore Manager",
+  "offshoreManagerName": "Offshore Manager",
+  "accountManagerName": "Account Manager"
+}
+
+###
+
+### Update a project
+PUT {{Pmp.Api_HostAddress}}/api/projects/{projectId}
+Content-Type: application/json
+
+{
+  "customerName": "Example Customer",
+  "projectName": "Updated Project",
+  "projectStartDate": "2026-01-01T00:00:00Z",
+  "projectEndDate": "2026-07-31T00:00:00Z",
+  "revisedEndDate": "2026-07-15T00:00:00Z",
+  "renewalDate": null,
+  "projectIssueDate": "2025-12-15T00:00:00Z",
+  "estimatedHours": 1400,
+  "actualHours": 300,
+  "onshoreManagerName": "Onshore Manager",
+  "offshoreManagerName": "Offshore Manager",
+  "accountManagerName": "Account Manager"
+}
+
+###
+
+### Update project status
+PATCH {{Pmp.Api_HostAddress}}/api/projects/{projectId}
+Content-Type: application/json
+
+{
+  "status": "Completed"
+}
