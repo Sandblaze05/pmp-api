@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using Pmp.Api.Data;
+using Pmp.Api.Middleware;
 using Pmp.Api.Services;
 using Scalar.AspNetCore;
 
@@ -18,6 +19,8 @@ builder.Services.AddCors(options =>
     });
 });
 builder.Services.AddOpenApi();
+builder.Services.AddExceptionHandler<ApiExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
@@ -30,6 +33,9 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 });
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
+app.UseStatusCodePages();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

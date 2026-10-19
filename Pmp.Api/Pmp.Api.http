@@ -1,7 +1,7 @@
 @Pmp.Api_HostAddress = http://localhost:5218
 
-### Get all projects
-GET {{Pmp.Api_HostAddress}}/api/projects
+### Get the first page of projects (the response includes hasNextPage)
+GET {{Pmp.Api_HostAddress}}/api/projects?page=1&status=PendingApproval
 Accept: application/json
 
 ###
@@ -28,7 +28,31 @@ Content-Type: application/json
   "actualHours": null,
   "onshoreManagerName": "Onshore Manager",
   "offshoreManagerName": "Offshore Manager",
-  "accountManagerName": "Account Manager"
+  "accountManagerName": "Account Manager",
+  "wizardDetails": {
+    "customerAddress": "1 Example Street",
+    "projectSector": "Business",
+    "clientContactName": "Client Contact",
+    "clientEmail": "client@example.com",
+    "clientPmName": "Client PM",
+    "clientPmEmail": "pm@example.com",
+    "projectDescription": "Example project description",
+    "scope": "Example project scope",
+    "managedBy": "Internal PMO",
+    "domain": "Operations",
+    "type": "Fixed Price",
+    "totalValue": 100000,
+    "methodology": "Agile",
+    "technology": "Angular",
+    "lead": "Project Lead",
+    "stakeholders": "Business stakeholders"
+  },
+  "tasks": [
+    { "name": "Discovery", "description": "Discover requirements" }
+  ],
+  "efforts": [
+    { "person": "Project Lead", "taskName": "Discovery", "estimatedHours": 40 }
+  ]
 }
 
 ###
@@ -49,7 +73,27 @@ Content-Type: application/json
   "actualHours": 300,
   "onshoreManagerName": "Onshore Manager",
   "offshoreManagerName": "Offshore Manager",
-  "accountManagerName": "Account Manager"
+  "accountManagerName": "Account Manager",
+  "wizardDetails": {
+    "customerAddress": "1 Example Street",
+    "projectSector": "Business",
+    "clientContactName": "Client Contact",
+    "clientEmail": "client@example.com",
+    "clientPmName": "Client PM",
+    "clientPmEmail": "pm@example.com",
+    "projectDescription": "Updated description",
+    "scope": "Updated scope",
+    "managedBy": "Internal PMO",
+    "domain": "Operations",
+    "type": "Fixed Price",
+    "totalValue": 100000,
+    "methodology": "Agile",
+    "technology": "Angular",
+    "lead": "Project Lead",
+    "stakeholders": "Business stakeholders"
+  },
+  "tasks": [],
+  "efforts": []
 }
 
 ###

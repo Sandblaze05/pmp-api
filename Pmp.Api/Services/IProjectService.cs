@@ -1,10 +1,15 @@
 using Pmp.Api.Contracts;
+using Pmp.Api.Models;
 
 namespace Pmp.Api.Services;
 
 public interface IProjectService
 {
-    Task<IReadOnlyList<ProjectResponse>> GetAllAsync(CancellationToken cancellationToken);
+    Task<ProjectListResponse> GetAllAsync(
+        int page,
+        int pageSize,
+        ProjectStatus? status,
+        CancellationToken cancellationToken);
 
     Task<ProjectResponse?> GetByIdAsync(string projectId, CancellationToken cancellationToken);
 

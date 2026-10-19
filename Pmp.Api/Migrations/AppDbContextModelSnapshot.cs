@@ -33,6 +33,10 @@ namespace Pmp.Api.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("EffortsJson")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<decimal>("EstimatedHours")
                         .HasColumnType("TEXT");
 
@@ -65,6 +69,14 @@ namespace Pmp.Api.Migrations
 
                     b.Property<int>("Status")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("TasksJson")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("WizardDetailsJson")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.HasKey("ProjectId");
 

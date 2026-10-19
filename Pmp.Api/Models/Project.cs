@@ -27,6 +27,10 @@ public sealed class Project
     public required string OffshoreManagerName { get; set; }
     public required string AccountManagerName { get; set; }
 
+    public required string WizardDetailsJson { get; set; }
+    public required string TasksJson { get; set; }
+    public required string EffortsJson { get; set; }
+
     public ProjectStatus Status { get; set; } = ProjectStatus.PendingApproval;
 
 }
