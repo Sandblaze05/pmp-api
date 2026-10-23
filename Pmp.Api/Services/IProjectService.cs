@@ -18,4 +18,6 @@ public interface IProjectService
     Task<ProjectResponse?> UpdateAsync(string projectId, UpdateProjectRequest request, CancellationToken cancellationToken);
     
     Task<ProjectResponse?> UpdateStatusAsync(string projectId, UpdateProjectStatusRequest request, CancellationToken cancellationToken);
+    
+    Task<ProjectListResponse> SearchAsync(int page, int pageSize, ProjectSearchFilters filters, CancellationToken cancellationToken);
 }

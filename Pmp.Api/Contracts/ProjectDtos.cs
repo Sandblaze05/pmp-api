@@ -4,7 +4,7 @@ namespace Pmp.Api.Contracts;
 
 public sealed record ProjectWizardDetails(
     string CustomerAddress,
-    string ProjectSector,
+    ProjectSector ProjectSector,
     string ClientContactName,
     string ClientEmail,
     string ClientPmName,
@@ -96,4 +96,13 @@ public sealed record ProjectResponse(
     ProjectWizardDetails WizardDetails,
     IReadOnlyList<ProjectTask> Tasks,
     IReadOnlyList<ProjectEffort> Efforts
+);
+
+public sealed record ProjectSearchFilters(
+    string? SearchTerm = null,
+    string? CustomerName = null,
+    string? ProjectName = null,
+    ProjectStatus? Status = null,
+    DateTimeOffset? StartDateFrom = null,
+    DateTimeOffset? StartDateTo = null
 );

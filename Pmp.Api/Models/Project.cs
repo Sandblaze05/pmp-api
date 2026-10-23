@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Pmp.Api.Models;
 
 public enum ProjectStatus
@@ -5,6 +7,17 @@ public enum ProjectStatus
     InProgress = 0,
     PendingApproval = 1,
     Completed = 3
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum ProjectSector
+{
+    Automobile,
+    Business,
+    Education,
+    [JsonStringEnumMemberName("Digital Media")]
+    DigitalMedia,
+    Default
 }
 
 public sealed class Project
@@ -33,4 +46,10 @@ public sealed class Project
 
     public ProjectStatus Status { get; set; } = ProjectStatus.PendingApproval;
 
+}
+
+public class ProjectIdCounter
+{
+    public int Id { get; set; }
+    public int LastNumber { get; set; }
 }

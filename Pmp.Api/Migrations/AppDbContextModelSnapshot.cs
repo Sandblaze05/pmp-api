@@ -80,7 +80,30 @@ namespace Pmp.Api.Migrations
 
                     b.HasKey("ProjectId");
 
+                    b.HasIndex("ProjectId")
+                        .IsUnique();
+
                     b.ToTable("Projects");
+                });
+
+            modelBuilder.Entity("Pmp.Api.Models.ProjectIdCounter", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("LastNumber")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProjectsIdCounters");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            LastNumber = 0
+                        });
                 });
 #pragma warning restore 612, 618
         }

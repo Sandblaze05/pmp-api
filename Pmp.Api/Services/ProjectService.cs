@@ -14,6 +14,9 @@ public sealed class ProjectService(AppDbContext db) : IProjectService
         ProjectStatus? status,
         CancellationToken cancellationToken)
     {
+        var _page = Math.Max(page, 1);
+        var _pageSize = Math.Clamp(pageSize, 1, 100);
+
         var query = db.Projects
             .AsNoTracking()
             .Where(project => status == null || project.Status == status);
@@ -22,13 +25,13 @@ public sealed class ProjectService(AppDbContext db) : IProjectService
         var projects = await query
             .OrderBy(project => project.ProjectName)
             .ThenBy(project => project.ProjectId)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize + 1)
+            .Skip((_page - 1) * pageSize)
+            .Take(_pageSize + 1)
             .ToListAsync(cancellationToken);
 
         return new ProjectListResponse(
-            projects.Take(pageSize).Select(ToResponse).ToList(),
-            projects.Count > pageSize,
+            projects.Take(_pageSize).Select(ToResponse).ToList(),
+            projects.Count > _pageSize,
             totalCount);
     }
 
@@ -43,9 +46,23 @@ public sealed class ProjectService(AppDbContext db) : IProjectService
 
     public async Task<ProjectResponse> CreateAsync(CreateProjectRequest request, CancellationToken cancellationToken)
     {
+        await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
+
+        var counter = db.ProjectsIdCounters.Where(c => c.Id == 1);
+
+        await counter.ExecuteUpdateAsync(
+            setters => setters.SetProperty(
+                c => c.LastNumber,
+                c => c.LastNumber + 1
+            ),
+            cancellationToken
+        );
+
+        var nextNumber = await counter.Select(c => c.LastNumber).SingleAsync(cancellationToken);
+
         var project = new Project
         {
-            ProjectId = await GenerateProjectIdAsync(cancellationToken),
+            ProjectId = $"SVAM_PROJECT_{nextNumber:D3}",
             CustomerName = request.CustomerName,
             ProjectName = request.ProjectName,
             ProjectStartDate = request.ProjectStartDate,
@@ -66,6 +83,7 @@ public sealed class ProjectService(AppDbContext db) : IProjectService
 
         db.Projects.Add(project);
         await db.SaveChangesAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
 
         return ToResponse(project);
     }
@@ -120,6 +138,67 @@ public sealed class ProjectService(AppDbContext db) : IProjectService
 
         return ToResponse(project);
     }
+
+    public async Task<ProjectListResponse> SearchAsync(int page, int pageSize, ProjectSearchFilters filters, CancellationToken cancellationToken)
+    {
+        IQueryable<Project> query = db.Projects;
+
+        if (!string.IsNullOrWhiteSpace(filters.SearchTerm))
+        {
+            var term = filters.SearchTerm.Trim();
+
+            query = query.Where(p => 
+                p.ProjectId.Contains(term) ||
+                p.ProjectName.Contains(term) ||
+                p.CustomerName.Contains(term) ||
+                p.OnshoreManagerName.Contains(term) ||
+                p.OffshoreManagerName.Contains(term) ||
+                p.AccountManagerName.Contains(term)
+            );
+        }
+
+        if (filters.Status is not null)
+        {
+            query = query.Where(p => p.Status == filters.Status);
+        }
+
+        if (filters.StartDateFrom is not null)
+        {
+            var startDate = filters.StartDateFrom.Value;
+            query = query.Where(p => p.ProjectStartDate >= startDate);
+        }
+
+        if (filters.StartDateTo is not null)
+        {
+            var endDate = filters.StartDateTo.Value;
+            query = query.Where(p => p.ProjectStartDate <= endDate);
+        }
+
+        if (!string.IsNullOrWhiteSpace(filters.CustomerName))
+        {
+            var customer = filters.CustomerName.Trim();
+            query = query.Where(p => p.CustomerName.Contains(customer));
+        }
+
+        var totalCount = await query.CountAsync(cancellationToken);
+        var _page = Math.Max(page, 1);
+        var _pageSize = Math.Clamp(pageSize, 1, 100);
+
+        var projects = await query
+            .OrderBy(p => p.ProjectName)
+            .Skip((_page - 1) * _pageSize)
+            .Take(_pageSize + 1)
+            .ToListAsync(cancellationToken);
+        
+        var hasMore = projects.Count > _pageSize;
+
+        var items = projects
+            .Take(_pageSize)
+            .Select(ToResponse)
+            .ToList();
+
+        return new ProjectListResponse(items, hasMore, totalCount);
+    }
     
     private static ProjectResponse ToResponse(Project project)
     {
@@ -160,7 +239,7 @@ public sealed class ProjectService(AppDbContext db) : IProjectService
     }
 
     private static ProjectWizardDetails EmptyWizardDetails() =>
-        new("", "", "", "", "", "", "", "", "", "", "", null, "", "", "", "");
+        new("", ProjectSector.Default, "", "", "", "", "", "", "", "", "", null, "", "", "", "");
 
     private static T Deserialize<T>(string json, T fallback)
     {
