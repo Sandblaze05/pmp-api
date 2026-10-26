@@ -223,20 +223,20 @@ public sealed class ProjectService(AppDbContext db) : IProjectService
         );
     }
 
-    private async Task<string> GenerateProjectIdAsync(CancellationToken cancellationToken)
-    {
-        var ids = await db.Projects
-            .Where(project => project.ProjectId.StartsWith("SVAM_PROJECT_"))
-            .Select(project => project.ProjectId)
-            .ToListAsync(cancellationToken);
+    // private async Task<string> GenerateProjectIdAsync(CancellationToken cancellationToken)
+    // {
+    //     var ids = await db.Projects
+    //         .Where(project => project.ProjectId.StartsWith("SVAM_PROJECT_"))
+    //         .Select(project => project.ProjectId)
+    //         .ToListAsync(cancellationToken);
 
-        var nextNumber = ids
-            .Select(id => int.TryParse(id["SVAM_PROJECT_".Length..], out var number) ? number : 0)
-            .DefaultIfEmpty()
-            .Max() + 1;
+    //     var nextNumber = ids
+    //         .Select(id => int.TryParse(id["SVAM_PROJECT_".Length..], out var number) ? number : 0)
+    //         .DefaultIfEmpty()
+    //         .Max() + 1;
 
-        return $"SVAM_PROJECT_{nextNumber:D3}";
-    }
+    //     return $"SVAM_PROJECT_{nextNumber:D3}";
+    // }
 
     private static ProjectWizardDetails EmptyWizardDetails() =>
         new("", ProjectSector.Default, "", "", "", "", "", "", "", "", "", null, "", "", "", "");

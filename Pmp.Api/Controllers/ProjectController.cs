@@ -85,4 +85,21 @@ public sealed class ProjectController(IProjectService service) : ControllerBase
                 detail: $"No project exists with ID '{projectId}'.")
             : Ok(project);
     }
+
+    [HttpPost("search")]
+    public async Task<ActionResult<ProjectListResponse>> SearchProjects(
+        ProjectSearchFilters projectSearchFilters,
+        [FromQuery] int page = 1,
+        CancellationToken cancellationToken = default)
+    {
+        if (page < 1)
+        {
+            return Problem(
+                statusCode: StatusCodes.Status400BadRequest,
+                title: "Invalid page",
+                detail: "The page must be at least 1.");
+        }
+
+        return Ok(await service.SearchAsync(page, 10, projectSearchFilters, cancellationToken));
+    }
 }
